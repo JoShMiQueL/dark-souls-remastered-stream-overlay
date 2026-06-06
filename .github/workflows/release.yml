@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"   # triggers on v1.0.0, v1.2.3, etc.
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Cache MSBuild output
+        uses: actions/cache@v4
+        with:
+          path: build\Release\obj
+          key: msbuild-${{ hashFiles('src/**', 'include/**', 'DarkSoulsTracker.vcxproj') }}
+          restore-keys: |
+            msbuild-
+
+      - name: Build (Release x64)
+        run: |
+          msbuild DarkSoulsTracker.vcxproj `
+            /p:Configuration=Release `
+            /p:Platform=x64 `
+            /p:OutDir=build\Release\ `
+            /p:IntDir=build\Release\obj\ `
+            /v:minimal `
+            /nologo
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Dark Souls Tracker ${{ github.ref_name }}"
+          body: |
+            ## Installation
+            1. Download `dinput8.dll` below
+            2. Copy it to your Dark Souls Remastered folder:
+               `C:\Program Files (x86)\Steam\steamapps\common\DARK SOULS REMASTERED\`
+            3. Launch the game — the WebSocket server starts on port 3000
+
+            See [README](https://github.com/${{ github.repository }}/blob/main/README.md) for full usage instructions.
+          files: build\Release\dinput8.dll
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}

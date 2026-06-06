@@ -1,0 +1,21 @@
+# Build output
+build/
+*.obj
+*.pdb
+*.iobj
+*.ipdb
+*.exp
+*.lib
+dinput8.dll
+
+# VS cruft
+.vs/
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+*.vcxproj.user
+ipch/
+
+# Logs generated at runtime
+*.log

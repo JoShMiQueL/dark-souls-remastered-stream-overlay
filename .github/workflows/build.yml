@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:                     # only run when source actually changes
+      - "src/**"
+      - "include/**"
+      - "DarkSoulsTracker.vcxproj"
+      - ".github/workflows/build.yml"
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "src/**"
+      - "include/**"
+      - "DarkSoulsTracker.vcxproj"
+      - ".github/workflows/build.yml"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      # Cache MSBuild intermediate files (.obj, IPDB, IOBJ).
+      # Key includes a hash of all source and project files so the cache
+      # is invalidated automatically whenever any of them changes.
+      - name: Cache MSBuild output
+        uses: actions/cache@v4
+        with:
+          path: build\Release\obj
+          key: msbuild-${{ hashFiles('src/**', 'include/**', 'DarkSoulsTracker.vcxproj') }}
+          restore-keys: |
+            msbuild-
+
+      - name: Build (Release x64)
+        run: |
+          msbuild DarkSoulsTracker.vcxproj `
+            /p:Configuration=Release `
+            /p:Platform=x64 `
+            /p:OutDir=build\Release\ `
+            /p:IntDir=build\Release\obj\ `
+            /v:minimal `
+            /nologo
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dinput8
+          path: build\Release\dinput8.dll
+          retention-days: 7

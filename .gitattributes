@@ -1,0 +1,18 @@
+# Normalize line endings
+* text=auto
+
+# Force LF for these file types (cross-platform consistency)
+*.cpp    text eol=lf
+*.h      text eol=lf
+*.md     text eol=lf
+*.yml    text eol=lf
+*.ps1    text eol=lf
+*.json   text eol=lf
+*.txt    text eol=lf
+
+# Binary files — no line ending conversion
+*.dll    binary
+*.lib    binary
+*.exp    binary
+*.png    binary
+*.CT     binary
