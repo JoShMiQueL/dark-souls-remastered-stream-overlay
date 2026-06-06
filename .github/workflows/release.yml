@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    runs-on: windows-2025
+    runs-on: windows-2025-vs2026
 
     steps:
       - name: Checkout
@@ -15,17 +15,6 @@ jobs:
 
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v3
-
-      # Cache MSBuild intermediate files (.obj, IPDB, IOBJ).
-      # Key includes a hash of all source and project files so the cache
-      # is invalidated automatically whenever any of them changes.
-      - name: Cache MSBuild output
-        uses: actions/cache@v5
-        with:
-          path: build\Release\obj
-          key: msbuild-${{ hashFiles('src/**', 'include/**', 'DarkSoulsTracker.vcxproj') }}
-          restore-keys: |
-            msbuild-
 
       - name: Build (Release x64)
         run: |
