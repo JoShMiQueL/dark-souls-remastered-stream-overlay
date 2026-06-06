@@ -6,7 +6,7 @@ Windows DLL mod for Dark Souls Remastered. Reads game memory (read-only) and exp
 
 ## Build
 
-- **Toolchain:** Visual Studio 2019/2022 — MSBuild, C++17, x64 only
+- **Toolchain:** Visual Studio 2026 — MSBuild, C++17, x64 only
 - **Build command:** `msbuild DarkSoulsTracker.vcxproj /p:Configuration=Release /p:Platform=x64 /p:OutDir=build\Release\ /p:IntDir=build\Release\obj\`
 - **CI:** GitHub Actions on `windows-2025-vs2026` (see `.github/workflows/build.yml`)
 - **Output:** `build/Release/dinput8.dll`

@@ -8,7 +8,7 @@ description: How to build the DarkSoulsTracker DLL using MSBuild on Windows.
 ## Requirements
 
 - Windows 10/11 x64
-- Visual Studio 2019 or 2022 with C++ Desktop workload
+- Visual Studio 2026 with C++ Desktop workload
 
 ## Build (command line)
 
