@@ -6,27 +6,45 @@ Write-Host "Dark Souls Tracker - Build Script" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# Find MSBuild
-$msbuildPaths = @(
-    "${env:ProgramFiles}\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe",
-    "${env:ProgramFiles}\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe",
-    "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe",
-    "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe",
-    "${env:ProgramFiles}\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe",
-    "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe"
-)
-
+# Find MSBuild — try vswhere first, then fall back to known paths
 $msbuildPath = $null
-foreach ($path in $msbuildPaths) {
-    if (Test-Path $path) {
-        $msbuildPath = $path
-        break
+
+# vswhere ships with VS 2017+ and the Build Tools
+$vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+if (Test-Path $vswhere) {
+    $vsInstallPath = & $vswhere -latest -requires Microsoft.Component.MSBuild -property installationPath 2>$null
+    if ($vsInstallPath) {
+        $candidate = Join-Path $vsInstallPath "MSBuild\Current\Bin\MSBuild.exe"
+        if (Test-Path $candidate) { $msbuildPath = $candidate }
+    }
+}
+
+# Fall back to well-known paths (newest first)
+if ($null -eq $msbuildPath) {
+    $msbuildPaths = @(
+        "${env:ProgramFiles}\Microsoft Visual Studio\2026\Community\MSBuild\Current\Bin\MSBuild.exe",
+        "${env:ProgramFiles}\Microsoft Visual Studio\2026\BuildTools\MSBuild\Current\Bin\MSBuild.exe",
+        "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2026\Community\MSBuild\Current\Bin\MSBuild.exe",
+        "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2026\BuildTools\MSBuild\Current\Bin\MSBuild.exe",
+        "${env:ProgramFiles}\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe",
+        "${env:ProgramFiles}\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe",
+        "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe",
+        "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe",
+        "${env:ProgramFiles}\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe",
+        "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe"
+    )
+
+    foreach ($path in $msbuildPaths) {
+        if (Test-Path $path) {
+            $msbuildPath = $path
+            break
+        }
     }
 }
 
 if ($null -eq $msbuildPath) {
     Write-Host "ERROR: MSBuild not found!" -ForegroundColor Red
-    Write-Host "Please install Visual Studio 2019 or 2022 with C++ build tools" -ForegroundColor Yellow
+    Write-Host "Please install Visual Studio 2019, 2022 or 2026 with C++ build tools" -ForegroundColor Yellow
     Read-Host "Press Enter to exit"
     exit 1
 }

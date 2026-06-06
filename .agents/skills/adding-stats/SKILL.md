@@ -11,28 +11,27 @@ Follow these steps in order:
    The "Not yet implemented" section lists available stats with their offset chains and types.
 
 2. **Add a field** to `PlayerStats` in `include/MemoryReader.h`.
-   Follow the existing naming convention (camelCase). Add it in the correct section
-   (Vitals, Resources, Attributes, etc.). Update `operator==` to include the new field.
+   Follow the existing naming convention (camelCase). Place it **before** the `valid` field.
+   The `operator==` uses `memcmp` up to `valid`, so new fields are included automatically.
 
 3. **Read it** in `MemoryReader::ReadPlayerStats()` in `src/MemoryReader.cpp`.
-   Use the `ReadInt()` helper with the correct pointer chain offset.
+   Use `ReadInt()` for 4-byte values or `ReadByte()` for single-byte values (widens to `int32_t`).
 
-4. **Serialize it** in `WebSocketServer::StatsToJson()` in `src/WebSocketServer.cpp`.
-   Add a JSON key matching the field name.
+4. **Register it** in `include/StatRegistry.h`:
+   - Add a `JsonField` entry in `JSON_FIELDS[]` (drives JSON serialization).
+   - Add a `DisplayStat` entry in `DISPLAY_STATS[]` (drives overlay rendering).
+     Set `pairedKey` for paired stats (e.g. `"maxHp"` for `"hp"`), or `nullptr` for simple stats.
 
-5. **Add an HTML block** in `WebSocketServer::StatBlock()` in `src/WebSocketServer.cpp`.
-   Follow the existing pattern for the stat type (single value, paired value, etc.).
-   Add the corresponding URL param token to `validStats`.
+5. **Rebuild** and test with the game running.
 
-6. **Rebuild** and test with the game running.
+> No manual HTML, JSON serialization, or `operator==` changes are needed — the data-driven
+> registry in `StatRegistry.h` handles all of that automatically.
 
 ## Checklist for the PR
 
-- [ ] Field added to `PlayerStats` struct
-- [ ] `operator==` updated
+- [ ] Field added to `PlayerStats` struct (before `valid`)
 - [ ] Memory read added in `ReadPlayerStats()`
-- [ ] JSON serialization added in `StatsToJson()`
-- [ ] HTML block added in `StatBlock()`
-- [ ] `validStats` updated with the URL param token
-- [ ] README table updated with the new stat
+- [ ] `JsonField` entry added in `StatRegistry.h`
+- [ ] `DisplayStat` entry added in `StatRegistry.h`
+- [ ] README stats table updated with the new stat
 - [ ] `POINTER_MAP.md` entry moved from "Not yet implemented" to "Currently implemented"

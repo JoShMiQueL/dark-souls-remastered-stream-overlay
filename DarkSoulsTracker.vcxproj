@@ -114,7 +114,12 @@
   <ItemGroup>
     <ClInclude Include="include\DebugConsole.h" />
     <ClInclude Include="include\MemoryReader.h" />
+    <ClInclude Include="include\StatRegistry.h" />
     <ClInclude Include="include\WebSocketServer.h" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ResourceCompile Include="DarkSoulsTracker.rc" />
   </ItemGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
