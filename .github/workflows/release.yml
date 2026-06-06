@@ -38,7 +38,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          name: "Dark Souls Tracker ${{ github.ref_name }}"
+          name: "Dark Souls Remastered Stream Overlay ${{ github.ref_name }}"
           body: |
             ## Installation
             1. Download `dinput8.dll` below
