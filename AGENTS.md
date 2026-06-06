@@ -23,10 +23,11 @@ Windows DLL mod for Dark Souls Remastered. Reads game memory (read-only) and exp
 ## Project Structure
 
 - `src/` — implementation (.cpp)
-- `include/` — headers (.h)
+- `include/` — headers (.h), including `StatRegistry.h` (data-driven stat ↔ JSON/display mapping)
 - `scripts/` — build automation (PowerShell)
 - `POINTER_MAP.md` — memory offset reference from Cheat Engine tables
 - `DarkSoulsTracker.vcxproj` — the single VS project file
+- `DarkSoulsTracker.rc` — version resource embedded in the DLL
 
 ## Rules
 
@@ -34,7 +35,7 @@ Windows DLL mod for Dark Souls Remastered. Reads game memory (read-only) and exp
 - Do not add external dependencies — the project uses only Win32 APIs and the C++ standard library.
 - Do not modify `.vcxproj` without good reason; it is the canonical build definition.
 - Keep the WebSocket server minimal — no frameworks, no npm, just raw WinSock.
-- All new stats must follow the 5-step workflow documented in README.md § Adding new stats.
+- All new stats must follow the data-driven workflow documented in README.md § Adding new stats and `.agents/skills/adding-stats/SKILL.md`.
 
 ## Testing
 
