@@ -76,7 +76,7 @@ std::string sha1(const std::string& input) {
         return "";
     }
 
-    if (!CryptHashData(hHash, (const BYTE*)input.c_str(), input.length(), 0)) {
+    if (!CryptHashData(hHash, (const BYTE*)input.c_str(), static_cast<DWORD>(input.length()), 0)) {
         CryptDestroyHash(hHash);
         CryptReleaseContext(hProv, 0);
         return "";
@@ -243,7 +243,7 @@ void WebSocketServer::HandleClient(SOCKET clientSocket) {
             DebugConsole::Log("[WebSocket] Client key extracted, generating handshake response...");
 
             std::string response = GenerateHandshakeResponse(clientKey);
-            int sendResult = send(clientSocket, response.c_str(), response.length(), 0);
+            int sendResult = send(clientSocket, response.c_str(), static_cast<int>(response.length()), 0);
             
             if (sendResult == SOCKET_ERROR) {
                 DebugConsole::Log("[WebSocket] ERROR: Failed to send handshake response");
@@ -331,7 +331,7 @@ std::string WebSocketServer::GenerateHandshakeResponse(const std::string& client
     }
 
     // Base64 encode the SHA-1 hash
-    std::string acceptKey = base64_encode((const unsigned char*)hash.c_str(), hash.length());
+    std::string acceptKey = base64_encode((const unsigned char*)hash.c_str(), static_cast<unsigned int>(hash.length()));
 
     std::string response = "HTTP/1.1 101 Switching Protocols\r\n"
                            "Upgrade: websocket\r\n"
@@ -344,8 +344,8 @@ std::string WebSocketServer::GenerateHandshakeResponse(const std::string& client
 std::string WebSocketServer::CreateWebSocketFrame(const std::string& data) {
     std::string frame;
 
-    // FIN bit set, text frame
-    frame.push_back(0x81);
+    // FIN bit set, text frame (opcode 0x1)
+    frame.push_back(static_cast<char>(0x81));
 
     // Payload length
     size_t len = data.length();
@@ -381,7 +381,7 @@ void WebSocketServer::BroadcastStats(const MemoryReader::PlayerStats& stats) {
     auto it = clients.begin();
     while (it != clients.end()) {
         SOCKET client = *it;
-        int result = send(client, frame.c_str(), frame.length(), 0);
+        int result = send(client, frame.c_str(), static_cast<int>(frame.length()), 0);
 
         if (result == SOCKET_ERROR) {
             closesocket(client);
