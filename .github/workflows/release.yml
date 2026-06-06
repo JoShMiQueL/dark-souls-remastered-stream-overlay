@@ -26,6 +26,12 @@ jobs:
             /v:minimal `
             /nologo
 
+      - name: Generate SHA-256 checksum
+        run: |
+          $hash = (Get-FileHash -Path build\Release\dinput8.dll -Algorithm SHA256).Hash
+          "$hash  dinput8.dll" | Out-File -FilePath build\Release\SHA256SUMS.txt -Encoding utf8
+          Write-Host "SHA-256: $hash"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -36,8 +42,17 @@ jobs:
             2. Copy it to your Dark Souls Remastered folder:
                `C:\Program Files (x86)\Steam\steamapps\common\DARK SOULS REMASTERED\`
             3. Launch the game — the WebSocket server starts on port 3000
+            4. (Optional) Create a `dstracker.ini` next to the DLL to change the port
 
             See [README](https://github.com/${{ github.repository }}/blob/main/README.md) for full usage instructions.
-          files: build\Release\dinput8.dll
+
+            ## Verify download
+            ```
+            certutil -hashfile dinput8.dll SHA256
+            ```
+            Compare the output with `SHA256SUMS.txt`.
+          files: |
+            build\Release\dinput8.dll
+            build\Release\SHA256SUMS.txt
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}

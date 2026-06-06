@@ -83,6 +83,14 @@ These stats are read by `MemoryReader::ReadPlayerStats()` and exposed via WebSoc
 | `trueDeaths` | `[BaseB + 0x94]` | int32 | "True Death Num" |
 | `playTime` | `[BaseB + 0xA4]` | int32 | "Play Time" (seconds) |
 
+### Game data
+
+| Field | Offset chain | Type | CT Description |
+|-------|-------------|------|----------------|
+| `ngPlus` | `[BaseB + 0x78]` | byte | "ClearCount" (NG+ count) |
+| `archetype` | `[ChrStat + 0xCE]` | byte | "ArcheType (Class)" |
+| `covenant` | `[ChrStat + 0x113]` | byte | "Vow_Type (covenant)" |
+
 ---
 
 ## Not yet implemented — available for extension
@@ -93,7 +101,7 @@ Add any of these by following the steps in [README.md § Adding new stats](READM
 
 | CT Description | Offset | Type | Notes |
 |----------------|--------|------|-------|
-| "ClearCount" | `[BaseB + 0x78]` | byte | NG+ count |
+| ~~"ClearCount"~~ | ~~`[BaseB + 0x78]`~~ | ~~byte~~ | **Implemented** as `ngPlus` |
 | "ClearState" | `[BaseB + 0x7C]` | byte | 0=none, 1=good, 2=bad |
 | "Full Recover" | `[BaseB + 0x80]` | int32 | |
 | "TrueDeath" | `[BaseB + 0x90]` | int32 | |
@@ -105,8 +113,8 @@ Add any of these by following the steps in [README.md § Adding new stats](READM
 
 | CT Description | Offset | Type | Notes |
 |----------------|--------|------|-------|
-| "ArcheType (Class)" | `[ChrStat + 0xCE]` | byte | Starting class ID |
-| "Vow_Type (covenant)" | `[ChrStat + 0x113]` | byte | Active covenant |
+| ~~"ArcheType (Class)"~~ | ~~`[ChrStat + 0xCE]`~~ | ~~byte~~ | **Implemented** as `archetype` |
+| ~~"Vow_Type (covenant)"~~ | ~~`[ChrStat + 0x113]`~~ | ~~byte~~ | **Implemented** as `covenant` |
 | "CurseLv" | `[ChrStat + 0x117]` | byte | Curse level |
 | "BaseMaxHP" | `[ChrStat + 0x18]` | int32 | Base HP before bonuses |
 | "Gender" | `[ChrStat + 0xCA]` | byte | |

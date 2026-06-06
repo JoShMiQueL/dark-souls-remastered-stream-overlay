@@ -6,19 +6,25 @@ on:
     paths:
       - "src/**"
       - "include/**"
-      - "DarkSoulsTracker.vcxproj"
+      - "*.vcxproj"
+      - "*.rc"
       - ".github/workflows/build.yml"
   pull_request:
     branches: [ "main" ]
     paths:
       - "src/**"
       - "include/**"
-      - "DarkSoulsTracker.vcxproj"
+      - "*.vcxproj"
+      - "*.rc"
       - ".github/workflows/build.yml"
 
 jobs:
   build:
     runs-on: windows-2025-vs2026
+
+    strategy:
+      matrix:
+        configuration: [Release, Debug]
 
     steps:
       - name: Checkout
@@ -27,17 +33,18 @@ jobs:
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v3
 
-      - name: Build (Release x64)
+      - name: Build (${{ matrix.configuration }} x64)
         run: |
           msbuild DarkSoulsTracker.vcxproj `
-            /p:Configuration=Release `
+            /p:Configuration=${{ matrix.configuration }} `
             /p:Platform=x64 `
-            /p:OutDir=build\Release\ `
-            /p:IntDir=build\Release\obj\ `
+            /p:OutDir=build\${{ matrix.configuration }}\ `
+            /p:IntDir=build\${{ matrix.configuration }}\obj\ `
             /v:minimal `
             /nologo
 
       - name: Upload build artifact
+        if: matrix.configuration == 'Release'
         uses: actions/upload-artifact@v7
         with:
           name: dinput8

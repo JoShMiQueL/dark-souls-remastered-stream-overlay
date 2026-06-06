@@ -64,9 +64,13 @@ static bool IsReadable(uintptr_t ptr) {
            mbi.Protect != PAGE_GUARD;
 }
 
-// Safe read helpers — return 0/0.0f on invalid address
+// Safe read helpers — return 0 on invalid address
 static int32_t ReadInt(uintptr_t ptr) {
     return IsReadable(ptr) ? *reinterpret_cast<int32_t*>(ptr) : 0;
+}
+
+static int32_t ReadByte(uintptr_t ptr) {
+    return IsReadable(ptr) ? static_cast<int32_t>(*reinterpret_cast<uint8_t*>(ptr)) : 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -140,6 +144,7 @@ uintptr_t MemoryReader::FindBaseBPtr() {
 // Attributes:  ChrStat + 0x40 / 0x48 / 0x50 / 0x58 / 0x60 / 0x88 / 0x68 / 0x70
 // Resistances: ChrStat + 0x100 / 0x104 / 0x108 / 0x10C
 // Counters:    BaseB   + 0x98 / 0x94 / 0xA4
+// Game data:   BaseB   + 0x78  |  ChrStat + 0xCE / 0x113
 // ---------------------------------------------------------------------------
 MemoryReader::PlayerStats MemoryReader::ReadPlayerStats() {
     PlayerStats s{};
@@ -187,6 +192,11 @@ MemoryReader::PlayerStats MemoryReader::ReadPlayerStats() {
     s.deaths     = ReadInt(baseB + 0x98);
     s.trueDeaths = ReadInt(baseB + 0x94);
     s.playTime   = ReadInt(baseB + 0xA4);
+
+    // Game data
+    s.ngPlus    = ReadByte(baseB + 0x78);
+    s.archetype = ReadByte(chrStat + 0xCE);
+    s.covenant  = ReadByte(chrStat + 0x113);
 
     s.valid = (s.maxHp > 0 && s.maxHp <= 99999 &&
                s.hp >= 0   && s.hp    <= s.maxHp);

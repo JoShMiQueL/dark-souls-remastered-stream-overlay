@@ -2,6 +2,8 @@
 
 #include <windows.h>
 #include <cstdint>
+#include <cstring>
+#include <type_traits>
 
 // ---------------------------------------------------------------------------
 // PlayerStats
@@ -10,10 +12,10 @@
 //
 // To add a new stat:
 //   1. Find the offset chain in POINTER_MAP.md
-//   2. Add the field here
+//   2. Add the field here (before 'valid')
 //   3. Read it in MemoryReader::ReadPlayerStats()
-//   4. Serialize it in WebSocketServer::StatsToJson()
-//   5. Add an HTML block in WebSocketServer::StatBlock()
+//   4. Add a JsonField entry in StatRegistry.h
+//   5. Add a DisplayStat entry in StatRegistry.h
 // ---------------------------------------------------------------------------
 class MemoryReader {
 public:
@@ -52,24 +54,24 @@ public:
         int32_t trueDeaths    = 0; // True Death Num [BaseB+0x94]
         int32_t playTime      = 0; // seconds        [BaseB+0xA4]
 
+        // --- Game data ---
+        int32_t ngPlus        = 0; // NG+ count (byte widened) [BaseB+0x78]
+        int32_t archetype     = 0; // Starting class ID (byte) [ChrStat+0xCE]
+        int32_t covenant      = 0; // Active covenant   (byte) [ChrStat+0x113]
+
+        // ---- keep 'valid' last — memcmp compares everything above it ----
         bool valid = false;
 
+        static_assert(std::is_standard_layout_v<int32_t>);
+
         bool operator==(const PlayerStats& o) const {
-            return hp == o.hp && maxHp == o.maxHp &&
-                   fp == o.fp && maxFp == o.maxFp &&
-                   stamina == o.stamina && maxStamina == o.maxStamina &&
-                   souls == o.souls && soulsTotal == o.soulsTotal &&
-                   soulLevel == o.soulLevel &&
-                   vit == o.vit && atn == o.atn && end == o.end &&
-                   str == o.str && dex == o.dex && res == o.res &&
-                   intl == o.intl && fth == o.fth &&
-                   poisonResist == o.poisonResist && bleedResist == o.bleedResist &&
-                   diseaseResist == o.diseaseResist && curseResist == o.curseResist &&
-                   deaths == o.deaths && trueDeaths == o.trueDeaths &&
-                   playTime == o.playTime;
+            return std::memcmp(this, &o, offsetof(PlayerStats, valid)) == 0;
         }
         bool operator!=(const PlayerStats& o) const { return !(*this == o); }
     };
+
+    static_assert(std::is_standard_layout_v<PlayerStats>,
+                  "PlayerStats must be standard layout for memcmp comparison");
 
     MemoryReader();
 
