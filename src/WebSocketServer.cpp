@@ -498,9 +498,8 @@ std::string WebSocketServer::ParsePath(const std::string& request) {
 // ---------------------------------------------------------------------------
 // GetHTMLPage — overlay page with client-side stat rendering
 //
-// The JS reads URL params (new syntax: ?hp&deaths='Label' or old ?stat=hp),
-// builds DOM elements, and updates values on WebSocket data.
-// Supports custom labels, templates, and raw mode.
+// The JS reads URL params (?hp&deaths='Label'), builds DOM elements,
+// and updates values on WebSocket data. Supports custom labels, templates, and raw mode.
 // ---------------------------------------------------------------------------
 std::string WebSocketServer::GetHTMLPage() {
     // Generate JS stat definitions from the C++ registry
@@ -524,7 +523,7 @@ std::string WebSocketServer::GetHTMLPage() {
     std::string js =
         "<script>\n"
         + defs + defaults +
-        // Parse URL params - supports both new (?hp&deaths='Label') and old (?stat=hp) syntax
+        // Parse URL params - stat keys are direct params (?hp&deaths='Label')
         "function gp(){"
           "var s=location.search.substring(1);"
           "if(!s)return[];"
@@ -532,8 +531,7 @@ std::string WebSocketServer::GetHTMLPage() {
           "for(var i=0;i<p.length;i++){"
             "var kv=p[i].split('=');"
             "var k=kv[0];"
-            "if(k==='stat'&&kv[1]&&r.indexOf(kv[1])===-1)r.push(kv[1]);"
-            "else if(S[k]&&r.indexOf(k)===-1)r.push(k);"
+            "if(S[k]&&r.indexOf(k)===-1)r.push(k);"
           "}"
           "return r;"
         "}\n"

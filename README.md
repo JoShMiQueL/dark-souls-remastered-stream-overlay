@@ -133,15 +133,8 @@ Add a **Browser Source** in OBS:
 
 ### Selective — specific stats in custom order
 
-Use `?stat=` params (old syntax) or the new simplified syntax where stat keys are direct URL params. Order in the URL = render order on screen.
+Use stat keys as direct URL params. Order in the URL = render order on screen.
 
-**Old syntax (still supported):**
-```
-http://localhost:3000/?stat=hp&stat=deaths
-http://localhost:3000/?stat=deaths&stat=souls&stat=soulLevel
-```
-
-**New syntax (recommended):**
 ```
 http://localhost:3000/?hp&deaths
 http://localhost:3000/?deaths&souls&soulLevel
