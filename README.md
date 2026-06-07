@@ -51,7 +51,7 @@ These are the available variables you can use in `_variable_` format in your tem
 | `soulLevel` | Soul level |
 | `deaths` | Death counter |
 | `trueDeaths` | True death counter |
-| `playTime` | Play time (seconds, format as H:MM:SS in templates) |
+| `playTime` | Play time (milliseconds, format as H:MM:SS by default) |
 | `vit` | Vitality |
 | `atn` | Attunement |
 | `end` | Endurance |
@@ -130,7 +130,7 @@ Add a **Browser Source** in OBS:
 
 ### Custom formatting — simplified syntax
 
-The simplified syntax uses templates directly in the URL. You can reference any stat variable in `${brackets}`.
+The simplified syntax uses templates directly in the URL. You can reference any stat variable in `_variable_` format.
 
 **Single line:**
 ```
