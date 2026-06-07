@@ -96,8 +96,8 @@ Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
 
 # Remove unnecessary files (.lib and .exp are not needed for this DLL mod)
-if (Test-Path "build\$configuration\dinput8.lib") { Remove-Item "build\$configuration\dinput8.lib" }
-if (Test-Path "build\$configuration\dinput8.exp") { Remove-Item "build\$configuration\dinput8.exp" }
+if (Test-Path "build\$configuration\dinput8.lib") { Remove-Item "build\$configuration\dinput8.lib" -ErrorAction SilentlyContinue }
+if (Test-Path "build\$configuration\dinput8.exp") { Remove-Item "build\$configuration\dinput8.exp" -ErrorAction SilentlyContinue }
 
 Write-Host "Output files:" -ForegroundColor Cyan
 if (Test-Path "build\$configuration\dinput8.dll") { Write-Host "  - build\$configuration\dinput8.dll" -ForegroundColor Gray }
