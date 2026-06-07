@@ -133,13 +133,67 @@ Add a **Browser Source** in OBS:
 
 ### Selective — specific stats in custom order
 
-Use `?stat=` params. Order in the URL = render order on screen.
+Use `?stat=` params (old syntax) or the new simplified syntax where stat keys are direct URL params. Order in the URL = render order on screen.
 
+**Old syntax (still supported):**
 ```
 http://localhost:3000/?stat=hp&stat=deaths
 http://localhost:3000/?stat=deaths&stat=souls&stat=soulLevel
-http://localhost:3000/?stat=hp&stat=stamina&stat=fp
 ```
+
+**New syntax (recommended):**
+```
+http://localhost:3000/?hp&deaths
+http://localhost:3000/?deaths&souls&soulLevel
+http://localhost:3000/?hp&stamina&fp
+```
+
+### Custom labels and formatting
+
+The new syntax allows custom labels for each stat:
+
+```
+# Custom labels (Spanish example)
+http://localhost:3000/?hp=Vida&deaths=Muertes&souls=Almas
+
+# Hide labels (show only values)
+http://localhost:3000/?hp=&deaths=&souls=
+
+# Emoji labels
+http://localhost:3000/?deaths=💀&souls=👻
+```
+
+### Template system
+
+For advanced formatting, use templates with variable substitution:
+
+```
+# Global template (applies to all stats)
+http://localhost:3000/?hp&deaths&template='💀 {value}'
+
+# Stat-specific template
+http://localhost:3000/?hp&maxHp&template_hp='Vida: {hp}/{maxHp}'
+
+# Complex format with multiple variables
+http://localhost:3000/?souls&deaths&template='Almas: {souls} | Muertes: {deaths}'
+```
+
+**Available template variables:**
+- `{value}` — current stat value
+- `{max}` — paired max value (for hp, fp, stamina)
+- `{hp}`, `{deaths}`, `{souls}`, etc. — any stat by key
+
+### Raw mode
+
+For minimal HTML output (value only, no labels, no styling):
+
+```
+http://localhost:3000/?deaths&mode=raw
+```
+
+This outputs a clean `<span>` with just the value, perfect for custom CSS styling or when you want complete control over the layout.
+
+For full control, create your own HTML file and connect to the WebSocket directly (see `docs/raw-template.html` for a starter template).
 
 ### Multi-PC setup (game PC + streaming PC)
 
