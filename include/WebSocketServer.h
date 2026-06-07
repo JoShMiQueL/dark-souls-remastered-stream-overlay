@@ -32,11 +32,14 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
+// Configuration constants
+static constexpr int DEFAULT_PORT = 3000;
+
 class WebSocketServer {
 public:
     static constexpr int MAX_CLIENTS = 20;
 
-    explicit WebSocketServer(int port = 3000);
+    explicit WebSocketServer(int port = DEFAULT_PORT);
     ~WebSocketServer();
 
     bool Start();

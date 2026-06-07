@@ -23,7 +23,6 @@
 // ---------------------------------------------------------------------------
 static constexpr int  GAME_LOAD_DELAY_SEC  = 5;    // wait for game to finish loading
 static constexpr int  STATS_POLL_MS        = 200;   // how often to poll memory (ms)
-static constexpr int  DEFAULT_PORT         = 3000;
 static constexpr int  MAX_RESCAN_FAILURES  = 50;    // consecutive failures before re-scanning BaseB
 
 // ---------------------------------------------------------------------------

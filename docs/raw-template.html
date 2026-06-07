@@ -97,8 +97,13 @@
     </div>
 
     <script>
+        // WebSocket configuration
+        // Change this if you're using a different port (configured in dstracker.ini)
+        const WS_PORT = 3000;
+        const WS_HOST = 'localhost';
+        
         // WebSocket connection
-        const ws = new WebSocket('ws://localhost:3000/ws');
+        const ws = new WebSocket(`ws://${WS_HOST}:${WS_PORT}/ws`);
         
         // Format play time as H:MM:SS
         function formatPlayTime(seconds) {
