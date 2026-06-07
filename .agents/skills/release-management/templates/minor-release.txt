@@ -1,0 +1,62 @@
+## Installation
+1. Download `dinput8.dll` below
+2. Copy it to your Dark Souls Remastered folder:
+   `C:\Program Files (x86)\Steam\steamapps\common\DARK SOULS REMASTERED\`
+3. Launch the game — the WebSocket server starts on port 3000
+4. (Optional) Create a `dstracker.ini` next to the DLL to change the port
+
+See [README](https://github.com/JoShMiqueL/dark-souls-remastered-stream-overlay/blob/main/README.md) for full usage instructions.
+
+## Verify download
+
+`certutil -hashfile dinput8.dll SHA256`
+
+Compare the output with `SHA256SUMS.txt`.
+
+---
+
+## 🎉 What's New in {VERSION}
+
+### New Feature Category
+- **Feature name** — Brief description of the feature
+- **Another feature** — Description with technical details
+- **Third feature** — Description explaining user benefit
+
+### Another Feature Category
+- **Feature name** — Description
+- **Feature name** — Description with example usage
+
+## 🔧 Refactoring
+
+### Code Improvements
+- **Refactoring category** — Description of improvements
+- **Performance optimization** — Description of performance gains
+
+## 🐛 Bug Fixes
+
+### Bug Category
+- **Bug description** — How it was fixed
+- **Another bug** — Fix details
+
+## 📦 CI/CD
+
+### Build Changes
+- **Build improvement** — Description
+
+## 📝 Documentation
+
+- **Documentation update** — Description
+
+---
+
+## Example Usage
+
+### Feature Example
+`Example URL or command showing the new feature`
+
+### Another Example
+`Another example`
+
+---
+
+**Full Changelog:** https://github.com/JoShMiqueL/dark-souls-remastered-stream-overlay/compare/{PREVIOUS_VERSION}...{VERSION}
