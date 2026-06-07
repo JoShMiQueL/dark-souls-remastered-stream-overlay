@@ -39,7 +39,7 @@ The DLL is injected as a `dinput8.dll` proxy — it loads alongside the game wit
 
 ## Exposed stats
 
-These are the available variables you can use in `{brackets}` in your templates. Use the **JSON key** column values.
+These are the available variables you can use in `_variable_` format in your templates. Use the **JSON key** column values.
 
 | JSON key | Description |
 |----------|-------------|
@@ -70,7 +70,7 @@ These are the available variables you can use in `{brackets}` in your templates.
 
 **Example usage:**
 ```
-?HP:%20{hp}/{maxHp}%20|Souls:%20{souls}%20|SL:%20{soulLevel}
+?HP:%20_hp_/_maxHp_%20|Souls:%20_souls_%20|SL:%20_soulLevel_
 ```
 
 ---
@@ -130,39 +130,73 @@ Add a **Browser Source** in OBS:
 
 ### Custom formatting — simplified syntax
 
-The simplified syntax uses templates directly in the URL. You can reference any stat variable in `{brackets}`.
+The simplified syntax uses templates directly in the URL. You can reference any stat variable in `${brackets}`.
 
 **Single line:**
 ```
-http://localhost:3000/?Vida:%20{hp}/{maxHp}%20-%20{playTime}
+http://localhost:3000/?Vida:%20_hp_/_maxHp_%20-%20_playTime:hms_
 ```
 
 **Multiple lines (pipe separator):**
 ```
-http://localhost:3000/?Vida:%20{hp}/{maxHp}|Almas:%20{souls}|Muertes:%20{deaths}
+http://localhost:3000/?Vida:%20_hp_/_maxHp_|Almas:%20_souls_|Muertes:%20_deaths_
 ```
 
 **Multiple lines (named parameters):**
 ```
-http://localhost:3000/?line1=Vida:%20{hp}/{maxHp}&line2=Almas:%20{souls}&line3=Muertes:%20{deaths}
+http://localhost:3000/?line1=Vida:%20_hp_/_maxHp_&line2=Almas:%20_souls_&line3=Muertes:%20_deaths_
 ```
 
-**Available variables:** All stat keys from the table above (`{hp}`, `{maxHp}`, `{fp}`, `{souls}`, `{deaths}`, etc.)
+**Available variables:** All stat keys from the table above (`_hp_`, `_maxHp_`, `_fp_`, `_souls_`, `_deaths_`, etc.)
+
+**Format modifiers:** Some variables support format modifiers:
+- `_playTime_` → H:MM:SS (default format for playTime)
+- `_playTime:hms_` → H:MM:SS (explicit)
+- `_playTime:s_` → seconds (number)
+- `_playTime:m_` → minutes
+- `_playTime:h_` → hours
+- `_playTime:ms_` → milliseconds (raw value)
+
+**Escape characters:** To show literal special characters in your template, escape them:
+- `\|` → literal `|` (pipe)
+- `\n` → literal newline
+- `\t` → literal tab
+- `\\` → literal backslash
+
+**Example (literal pipe):**
+```
+http://localhost:3000/?HP:%20_hp_\|_maxHp_
+```
+Result: `HP: 594|594` (one line with literal pipe)
 
 ### URL Builder
 
-For complex overlays, use an online URL encoder/formatter to build your URLs:
+For complex overlays, use any standard online URL encoder. The `_variable_` syntax uses underscores which are not encoded by standard URL encoders (RFC 3986).
 
-1. Write your template in plain text: `Vida: {hp}/{maxHp} - Tiempo: {playTime}`
-2. Use a URL encoder (e.g., [urlencoder.org](https://www.urlencoder.org/)) to encode it
-3. Paste the encoded text after `?` in your OBS Browser Source
+**Recommended encoder:** [urlencoder.org](https://www.urlencoder.org/)
+
+**Characters that need encoding:**
+- Space → `%20`
+- `&` → `%26`
+- `=` → `%3D`
+- `?` → `%3F`
+- `#` → `%23`
+
+**Characters that don't need encoding:**
+- `_` — variable syntax (unreserved per RFC 3986)
+- `/` — separator
+- `:` — label separator
+- `-` — dash
+- `|` — line separator (unless escaped as `\|`)
 
 **Example workflow:**
 ```
-Plain text: Vida: {hp}/{maxHp} - Tiempo: {playTime}
-Encoded: Vida:%20{hp}/{maxHp}%20-%20Tiempo:%20{playTime}
-Final URL: http://localhost:3000/?Vida:%20{hp}/{maxHp}%20-%20Tiempo:%20{playTime}
+Plain text: Vida: _hp_/_maxHp_ - Tiempo: _playTime_
+Encoded:    Vida:%20_hp_/_maxHp_%20-%20Tiempo:%20_playTime_
+Final URL:  http://localhost:3000/?Vida:%20_hp_/_maxHp_%20-%20Tiempo:%20_playTime_
 ```
+
+**Note:** The `_variable_` syntax is compatible with all standard URL encoders since underscores are unreserved characters per RFC 3986.
 
 ### Custom HTML overlays
 
@@ -211,7 +245,7 @@ The WebSocket server listens on all network interfaces by default, so you can ru
 2. Find the game PC's local IP (e.g. `192.168.1.50`)
 3. On the **streaming PC**, add a Browser Source pointing to the game PC:
    ```
-   http://192.168.1.50:3000/?HP:%20{hp}/{maxHp}|Souls:%20{souls}
+   http://192.168.1.50:3000/?HP:%20_hp_/_maxHp_|Souls:%20_souls_
    ```
 4. The WebSocket will connect across the network and update in real time
 

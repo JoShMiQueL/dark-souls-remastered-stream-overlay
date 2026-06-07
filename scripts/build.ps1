@@ -94,10 +94,13 @@ Write-Host "========================================" -ForegroundColor Green
 Write-Host "BUILD SUCCESSFUL" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
+
+# Remove unnecessary files (.lib and .exp are not needed for this DLL mod)
+if (Test-Path "build\$configuration\dinput8.lib") { Remove-Item "build\$configuration\dinput8.lib" }
+if (Test-Path "build\$configuration\dinput8.exp") { Remove-Item "build\$configuration\dinput8.exp" }
+
 Write-Host "Output files:" -ForegroundColor Cyan
 if (Test-Path "build\$configuration\dinput8.dll") { Write-Host "  - build\$configuration\dinput8.dll" -ForegroundColor Gray }
-if (Test-Path "build\$configuration\dinput8.lib") { Write-Host "  - build\$configuration\dinput8.lib" -ForegroundColor Gray }
-if (Test-Path "build\$configuration\dinput8.exp") { Write-Host "  - build\$configuration\dinput8.exp" -ForegroundColor Gray }
 Write-Host ""
 Write-Host "To install, copy dinput8.dll to your Dark Souls Remastered folder:" -ForegroundColor Yellow
 Write-Host "  build\$configuration\dinput8.dll" -ForegroundColor Gray
