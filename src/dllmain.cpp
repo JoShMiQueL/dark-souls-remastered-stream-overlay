@@ -99,9 +99,6 @@ static void GameLoop() {
             consecutiveFailures = 0;
             if (stats != lastStats) {
                 wsServer->BroadcastStats(stats);
-                sprintf_s(msg, "[GameLoop] HP:%d/%d Deaths:%d Souls:%d",
-                          stats.hp, stats.maxHp, stats.deaths, stats.souls);
-                DebugConsole::Log(msg);
                 lastStats = stats;
             }
         } else {

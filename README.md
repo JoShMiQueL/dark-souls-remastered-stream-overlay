@@ -39,32 +39,52 @@ The DLL is injected as a `dinput8.dll` proxy — it loads alongside the game wit
 
 ## Exposed stats
 
-| URL param | JSON key | Description |
-|-----------|----------|-------------|
-| `hp` | `hp` / `maxHp` | Current and max HP |
-| `fp` | `fp` / `maxFp` | Focus Points (mana) |
-| `stamina` | `stamina` / `maxStamina` | Stamina |
-| `souls` | `souls` | Current souls |
-| `soulsTotal` | `soulsTotal` | Total souls collected |
-| `soulLevel` | `soulLevel` | Soul level |
-| `deaths` | `deaths` | Death counter |
-| `trueDeaths` | `trueDeaths` | True death counter |
-| `playTime` | `playTime` | Play time (formatted as H:MM:SS in the overlay) |
-| `vit` | `vit` | Vitality |
-| `atn` | `atn` | Attunement |
-| `end` | `end` | Endurance |
-| `str` | `str` | Strength |
-| `dex` | `dex` | Dexterity |
-| `res` | `res` | Resistance |
-| `int` | `int` | Intelligence |
-| `fth` | `fth` | Faith |
-| `poisonResist` | `poisonResist` | Poison resistance |
-| `bleedResist` | `bleedResist` | Bleed resistance |
-| `diseaseResist` | `diseaseResist` | Disease resistance |
-| `curseResist` | `curseResist` | Curse resistance |
-| `ngPlus` | `ngPlus` | NG+ count (0 = first playthrough) |
-| `archetype` | `archetype` | Starting class ID |
-| `covenant` | `covenant` | Active covenant ID |
+These are the available variables you can use in `{brackets}` in your templates. Use the **JSON key** column values.
+
+| JSON key | Description |
+|----------|-------------|
+| `hp` / `maxHp` | Current and max HP |
+| `fp` / `maxFp` | Focus Points (mana) |
+| `stamina` / `maxStamina` | Stamina |
+| `souls` | Current souls |
+| `soulsTotal` | Total souls collected |
+| `soulLevel` | Soul level |
+| `deaths` | Death counter |
+| `trueDeaths` | True death counter |
+| `playTime` | Play time (seconds, format as H:MM:SS in templates) |
+| `vit` | Vitality |
+| `atn` | Attunement |
+| `end` | Endurance |
+| `str` | Strength |
+| `dex` | Dexterity |
+| `res` | Resistance |
+| `int` | Intelligence |
+| `fth` | Faith |
+| `poisonResist` | Poison resistance |
+| `bleedResist` | Bleed resistance |
+| `diseaseResist` | Disease resistance |
+| `curseResist` | Curse resistance |
+| `ngPlus` | NG+ count (0 = first playthrough) |
+| `archetype` | Starting class ID |
+| `covenant` | Active covenant ID |
+
+**Example usage:**
+```
+?HP:%20{hp}/{maxHp}%20|Souls:%20{souls}%20|SL:%20{soulLevel}
+```
+
+---
+
+## Installation
+
+1. Download the latest release from [GitHub Releases](https://github.com/yourusername/DarkSoulsTracker/releases)
+2. Copy `dinput8.dll` to your game folder:
+   ```
+   C:\Program Files (x86)\Steam\steamapps\common\DARK SOULS REMASTERED\
+   ```
+3. Launch the game — the WebSocket server starts automatically on port 3000
+
+> **Backup** any existing `dinput8.dll` in the game folder before installing.
 
 ---
 
@@ -72,32 +92,9 @@ The DLL is injected as a `dinput8.dll` proxy — it loads alongside the game wit
 
 - Windows 10/11 x64
 - Dark Souls Remastered (Steam)
-- Visual Studio 2022 or 2026 (for building)
+- OBS Studio (for overlays)
 
----
-
-## Building
-
-```powershell
-.\scripts\build.ps1
-```
-
-The script locates MSBuild automatically (via `vswhere` or known VS install paths) and builds a Release x64 `dinput8.dll` into `build\Release\`.
-
-Alternatively, open `DarkSoulsTracker.vcxproj` in Visual Studio and build **Release | x64**.
-
----
-
-## Installation
-
-1. Build the project (or download a release)
-2. Copy `build\Release\dinput8.dll` to your game folder:
-   ```
-   C:\Program Files (x86)\Steam\steamapps\common\DARK SOULS REMASTERED\
-   ```
-3. Launch the game — the WebSocket server starts automatically on port 3000
-
-> **Backup** any existing `dinput8.dll` in the game folder before installing.
+> **For developers:** See [DEVELOPER.md](DEVELOPER.md) for build requirements and technical details.
 
 ---
 
@@ -131,62 +128,80 @@ Add a **Browser Source** in OBS:
 | Height | 300 |
 | Shutdown source when not visible | yes |
 
-### Selective — specific stats in custom order
+### Custom formatting — simplified syntax
 
-Use stat keys as direct URL params. Order in the URL = render order on screen.
+The simplified syntax uses templates directly in the URL. You can reference any stat variable in `{brackets}`.
 
+**Single line:**
 ```
-http://localhost:3000/?hp&deaths
-http://localhost:3000/?deaths&souls&soulLevel
-http://localhost:3000/?hp&stamina&fp
-```
-
-### Custom labels and formatting
-
-The new syntax allows custom labels for each stat:
-
-```
-# Custom labels (Spanish example)
-http://localhost:3000/?hp=Vida&deaths=Muertes&souls=Almas
-
-# Hide labels (show only values)
-http://localhost:3000/?hp=&deaths=&souls=
-
-# Emoji labels
-http://localhost:3000/?deaths=💀&souls=👻
+http://localhost:3000/?Vida:%20{hp}/{maxHp}%20-%20{playTime}
 ```
 
-### Template system
-
-For advanced formatting, use templates with variable substitution:
-
+**Multiple lines (pipe separator):**
 ```
-# Global template (applies to all stats)
-http://localhost:3000/?hp&deaths&template='💀 {value}'
-
-# Stat-specific template
-http://localhost:3000/?hp&maxHp&template_hp='Vida: {hp}/{maxHp}'
-
-# Complex format with multiple variables
-http://localhost:3000/?souls&deaths&template='Almas: {souls} | Muertes: {deaths}'
+http://localhost:3000/?Vida:%20{hp}/{maxHp}|Almas:%20{souls}|Muertes:%20{deaths}
 ```
 
-**Available template variables:**
-- `{value}` — current stat value
-- `{max}` — paired max value (for hp, fp, stamina)
-- `{hp}`, `{deaths}`, `{souls}`, etc. — any stat by key
-
-### Raw mode
-
-For minimal HTML output (value only, no labels, no styling):
-
+**Multiple lines (named parameters):**
 ```
-http://localhost:3000/?deaths&mode=raw
+http://localhost:3000/?line1=Vida:%20{hp}/{maxHp}&line2=Almas:%20{souls}&line3=Muertes:%20{deaths}
 ```
 
-This outputs a clean `<span>` with just the value, perfect for custom CSS styling or when you want complete control over the layout.
+**Available variables:** All stat keys from the table above (`{hp}`, `{maxHp}`, `{fp}`, `{souls}`, `{deaths}`, etc.)
 
-For full control, create your own HTML file and connect to the WebSocket directly (see `docs/raw-template.html` for a starter template).
+### URL Builder
+
+For complex overlays, use an online URL encoder/formatter to build your URLs:
+
+1. Write your template in plain text: `Vida: {hp}/{maxHp} - Tiempo: {playTime}`
+2. Use a URL encoder (e.g., [urlencoder.org](https://www.urlencoder.org/)) to encode it
+3. Paste the encoded text after `?` in your OBS Browser Source
+
+**Example workflow:**
+```
+Plain text: Vida: {hp}/{maxHp} - Tiempo: {playTime}
+Encoded: Vida:%20{hp}/{maxHp}%20-%20Tiempo:%20{playTime}
+Final URL: http://localhost:3000/?Vida:%20{hp}/{maxHp}%20-%20Tiempo:%20{playTime}
+```
+
+### Custom HTML overlays
+
+For complete control over your overlay design, you can create your own HTML file and connect to the WebSocket directly.
+
+**When to use custom HTML:**
+- Complex layouts (grids, bars, progress indicators)
+- Custom animations and transitions
+- Integration with other web services
+- When you need full CSS/JavaScript control
+
+**How to use:**
+
+1. Copy `docs/raw-template.html` as a starting point
+2. Modify the HTML/CSS to match your design
+3. Add the file as a **Local File** Browser Source in OBS
+4. The template connects to `ws://localhost:3000/ws` automatically
+
+**Example features in raw-template.html:**
+- HP bar with percentage visualization
+- Custom styling and colors
+- Emoji integration
+- Auto-reconnect on connection loss
+
+**WebSocket data format:**
+```json
+{
+  "hp": 450, "maxHp": 1000,
+  "fp": 80, "maxFp": 100,
+  "stamina": 93, "maxStamina": 93,
+  "souls": 12500, "soulsTotal": 847300, "soulLevel": 42,
+  "deaths": 7, "trueDeaths": 3, "playTime": 18340,
+  ...
+}
+```
+
+**Comparison:**
+- **URL templates:** Quick setup, simple overlays, no HTML editing
+- **Custom HTML:** Full control, complex designs, requires HTML/CSS knowledge
 
 ### Multi-PC setup (game PC + streaming PC)
 
@@ -196,7 +211,7 @@ The WebSocket server listens on all network interfaces by default, so you can ru
 2. Find the game PC's local IP (e.g. `192.168.1.50`)
 3. On the **streaming PC**, add a Browser Source pointing to the game PC:
    ```
-   http://192.168.1.50:3000/?stat=hp&stat=deaths
+   http://192.168.1.50:3000/?HP:%20{hp}/{maxHp}|Souls:%20{souls}
    ```
 4. The WebSocket will connect across the network and update in real time
 
@@ -269,51 +284,9 @@ Connect to `ws://<host>:<port>/ws` to receive JSON on every stat change:
 
 ---
 
-## Project structure
+## Developer Documentation
 
-```
-DarkSoulsTracker/
-├── src/
-│   ├── dllmain.cpp           # DLL entry point, game loop thread
-│   ├── DirectInputProxy.cpp  # Forwards DirectInput8Create to system DLL
-│   ├── MemoryReader.cpp      # Pattern scan + pointer chain reads
-│   ├── WebSocketServer.cpp   # HTTP + WebSocket server
-│   └── DebugConsole.cpp      # Console + log file output
-├── include/
-│   ├── MemoryReader.h        # PlayerStats struct (add new stats here)
-│   ├── StatRegistry.h        # Data-driven stat ↔ JSON/display mapping
-│   ├── WebSocketServer.h
-│   └── DebugConsole.h
-├── scripts/
-│   └── build.ps1             # MSBuild wrapper (supports VS 2019/2022/2026)
-├── build/                    # Compiled output (git-ignored)
-├── DarkSoulsTracker.rc       # Version resource embedded in the DLL
-├── POINTER_MAP.md            # Full pointer reference from the Cheat Table
-├── All_DarkSoulsRemastered_CheatTables.CT  # Source Cheat Table (reference only)
-├── DarkSoulsTracker.vcxproj
-└── README.md
-```
-
----
-
-## Adding new stats
-
-1. Look up the offset chain in [`POINTER_MAP.md`](POINTER_MAP.md)
-2. Add a field to `PlayerStats` in `include/MemoryReader.h` (**before** the `valid` field)
-3. Read it in `MemoryReader::ReadPlayerStats()` (`src/MemoryReader.cpp`)
-4. Add a `JsonField` entry in `include/StatRegistry.h` (drives JSON serialization)
-5. Add a `DisplayStat` entry in `include/StatRegistry.h` (drives overlay rendering)
-6. Rebuild
-
-> The `operator==` comparison uses `memcmp` up to the `valid` field, so new fields are automatically included in change detection. The overlay page generates its HTML from the stat registry, so no manual HTML changes are needed.
-
----
-
-## Debug
-
-The debug console is **disabled by default**.  
-To enable it for development, set `#define ENABLE_DEBUG_CONSOLE 1` in `include/DebugConsole.h` and rebuild.  
-A `dstracker.log` file is written to the game folder regardless of this setting.
+For build instructions, project structure, adding new stats, and technical details, see [DEVELOPER.md](DEVELOPER.md).
 
 ---
 
